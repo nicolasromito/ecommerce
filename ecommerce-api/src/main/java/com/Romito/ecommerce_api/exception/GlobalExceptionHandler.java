@@ -60,6 +60,7 @@ public class GlobalExceptionHandler {
                 details);
         return ResponseEntity.badRequest().body(body);
     }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         return build(HttpStatus.BAD_REQUEST,
@@ -70,6 +71,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Ocurrió un error inesperado");
     }
+
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message) {
         ErrorResponse body = new ErrorResponse(status.value(), status.getReasonPhrase(), message);
         return ResponseEntity.status(status).body(body);

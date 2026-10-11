@@ -23,9 +23,9 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthService(AppUserRepository appUserRepository,
-                        RoleRepository roleRepository,
-                        PasswordEncoder passwordEncoder,
-                        JwtService jwtService) {
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
         this.appUserRepository = appUserRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;

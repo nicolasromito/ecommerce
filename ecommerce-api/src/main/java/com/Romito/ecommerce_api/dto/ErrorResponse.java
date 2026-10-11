@@ -8,8 +8,7 @@ public record ErrorResponse(
         int status,
         String error,
         String message,
-        List<String> details
-) {
+        List<String> details) {
     public ErrorResponse(int status, String error, String message) {
         this(LocalDateTime.now(), status, error, message, null);
     }

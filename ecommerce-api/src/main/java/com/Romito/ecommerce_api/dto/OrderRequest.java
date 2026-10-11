@@ -6,5 +6,5 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 public record OrderRequest(
-        @NotEmpty @Valid List<OrderItemRequest> items
-) {}
+                @NotEmpty @Valid List<OrderItemRequest> items) {
+}

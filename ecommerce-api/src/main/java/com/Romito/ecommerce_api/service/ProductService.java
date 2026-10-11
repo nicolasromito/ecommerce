@@ -24,13 +24,13 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     public ProductService(ProductRepository productRepository,
-                           CategoryRepository categoryRepository) {
+            CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
     }
 
     public Page<ProductResponse> findAll(Long categoryId, BigDecimal minPrice,
-                                      BigDecimal maxPrice, Pageable pageable) {
+            BigDecimal maxPrice, Pageable pageable) {
         Specification<Product> spec = Specification
                 .where(ProductSpecifications.hasCategoryId(categoryId))
                 .and(ProductSpecifications.hasPriceGreaterThanOrEqual(minPrice))
@@ -38,7 +38,7 @@ public class ProductService {
 
         return productRepository.findAll(spec, pageable)
                 .map(this::toResponse);
-        }
+    }
 
     public ProductResponse findById(Long id) {
         Product product = productRepository.findById(id)
@@ -70,7 +70,6 @@ public class ProductService {
                 product.getPrice(),
                 product.getStock(),
                 product.getCategory().getId(),
-                product.getCategory().getName()
-        );
+                product.getCategory().getName());
     }
 }

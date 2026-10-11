@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record OrderResponse(
-        Long id,
-        BigDecimal total,
-        OrderStatus status,
-        LocalDateTime createdAt,
-        List<OrderItemResponse> items
-) {}
+                Long id,
+                BigDecimal total,
+                OrderStatus status,
+                LocalDateTime createdAt,
+                List<OrderItemResponse> items) {
+}

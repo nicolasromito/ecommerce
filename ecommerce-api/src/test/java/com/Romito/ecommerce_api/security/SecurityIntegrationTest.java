@@ -23,85 +23,87 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 
 class SecurityIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private JsonMapper jsonMapper;
+        @Autowired
+        private JsonMapper jsonMapper;
 
-    @Test
-    void listarProductosEsPublico() throws Exception {
-        mockMvc.perform(get("/api/products"))
-                .andExpect(status().isOk());
-    }
+        @Test
+        void listarProductosEsPublico() throws Exception {
+                mockMvc.perform(get("/api/products"))
+                                .andExpect(status().isOk());
+        }
 
-    @Test
-    void crearProductoSinTokenDevuelve403() throws Exception {
-        ProductRequest request = new ProductRequest(
-                "Mouse", null, new BigDecimal("10000.00"), 5, 1L);
+        @Test
+        void crearProductoSinTokenDevuelve401() throws Exception {
+                ProductRequest request = new ProductRequest(
+                                "Mouse", null, new BigDecimal("10000.00"), 5, 1L);
 
-        mockMvc.perform(post("/api/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(post("/api/products")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(request)))
+                                .andExpect(status().isUnauthorized());
+        }
 
-    @Test
-    void usuarioConRolUserNoPuedeCrearProducto() throws Exception {
-        String token = registrarYObtenerToken("mperez", "mperez@example.com", "password123");
+        @Test
+        void usuarioConRolUserNoPuedeCrearProducto() throws Exception {
+                String token = registrarYObtenerToken("mperez", "mperez@example.com", "password123");
 
-        ProductRequest request = new ProductRequest(
-                "Mouse", null, new BigDecimal("10000.00"), 5, 1L);
+                ProductRequest request = new ProductRequest(
+                                "Mouse", null, new BigDecimal("10000.00"), 5, 1L);
 
-        mockMvc.perform(post("/api/products")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
-    }
-   @Test
-    void adminPuedeCrearProducto() throws Exception {
-        String loginResponse = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"username":"admin","password":"Admin123!"}
-                                """))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                mockMvc.perform(post("/api/products")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(request)))
+                                .andExpect(status().isForbidden());
+        }
 
-        String token = jsonMapper.readTree(loginResponse).get("token").asText();
+        @Test
+        void adminPuedeCrearProducto() throws Exception {
+                String loginResponse = mockMvc.perform(post("/api/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                                {"username":"admin","password":"Admin123!"}
+                                                """))
+                                .andExpect(status().isOk())
+                                .andReturn().getResponse().getContentAsString();
 
-        String categoryResponse = mockMvc.perform(post("/api/categories")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"name":"Periféricos"}
-                                """))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+                String token = jsonMapper.readTree(loginResponse).get("token").asText();
 
-        Long categoryId = jsonMapper.readTree(categoryResponse).get("id").asLong();
+                String categoryResponse = mockMvc.perform(post("/api/categories")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                                {"name":"Periféricos"}
+                                                """))
+                                .andExpect(status().isCreated())
+                                .andReturn().getResponse().getContentAsString();
 
-        ProductRequest request = new ProductRequest(
-                "Teclado mecánico", "Switches rojos",
-                new BigDecimal("45000.00"), 10, categoryId);
+                Long categoryId = jsonMapper.readTree(categoryResponse).get("id").asLong();
 
-        mockMvc.perform(post("/api/products")
-                        .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
-    }
-    private String registrarYObtenerToken(String username, String email, String password) throws Exception {
-        RegisterRequest request = new RegisterRequest(username, email, password);
+                ProductRequest request = new ProductRequest(
+                                "Teclado mecánico", "Switches rojos",
+                                new BigDecimal("45000.00"), 10, categoryId);
 
-        String responseJson = mockMvc.perform(post("/api/auth/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+                mockMvc.perform(post("/api/products")
+                                .header("Authorization", "Bearer " + token)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(request)))
+                                .andExpect(status().isCreated());
+        }
 
-        var node = jsonMapper.readTree(responseJson);
-        return node.get("token").asText();
-    }
+        private String registrarYObtenerToken(String username, String email, String password) throws Exception {
+                RegisterRequest request = new RegisterRequest(username, email, password);
+
+                String responseJson = mockMvc.perform(post("/api/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(request)))
+                                .andExpect(status().isCreated())
+                                .andReturn().getResponse().getContentAsString();
+
+                var node = jsonMapper.readTree(responseJson);
+                return node.get("token").asText();
+        }
 }

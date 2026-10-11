@@ -8,6 +8,7 @@ import OrdersPage from './pages/OrdersPage';
 import OrderDetailPage from './pages/OrderDetailPage';
 import AdminPage from './pages/AdminPage';
 import AdminRoute from './components/AdminRoute';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/orders/:id" element={<OrderDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
     </div>
