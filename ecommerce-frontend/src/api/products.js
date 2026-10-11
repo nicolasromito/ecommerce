@@ -9,6 +9,6 @@ export function getProducts({ page = 0, size = 10, categoryId, minPrice, maxPric
   return apiClient.get('/products', { params });
 }
 
-export function getCategories() {
-  return apiClient.get('/categories');
+export function createProduct(product) {
+  return apiClient.post('/products', product);
 }
